@@ -3,22 +3,35 @@ import { NavLink } from "react-router-dom";
 import { UserContext } from "../context/UserProvider";
 
 const Navbar = () => {
-  const { user, setUser } = useContext(UserContext);
+    const { user, signOutUser } = useContext(UserContext);
 
-  return (
-    <>
-      <div>
-        {user ? (
-          <>
-            <NavLink to="/">Inicio</NavLink> |
-            <button onClick={() => setUser(false)}>Cerrar session</button> |
-          </>
-        ) : (
-          <NavLink to="/login">Login</NavLink>
-        )}
-      </div>
-    </>
-  );
+    const handleClickLogOut = async () => {
+        try {
+            await signOutUser();
+        } catch (error) {
+            console.log(error.code);
+        }
+    };
+
+    return (
+        <>
+            <div>
+                {user ? (
+                    <>
+                        <NavLink to="/">Inicio</NavLink> -{" "}
+                        <button onClick={handleClickLogOut}>
+                            Cerrar session
+                        </button>{" "}
+                    </>
+                ) : (
+                    <>
+                        <NavLink to="/login">Login | </NavLink>
+                        <NavLink to="/register">Registrar</NavLink>
+                    </>
+                )}
+            </div>
+        </>
+    );
 };
 
 export default Navbar;
