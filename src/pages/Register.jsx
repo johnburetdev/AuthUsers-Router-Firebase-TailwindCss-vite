@@ -10,21 +10,31 @@ const Register = () => {
         register,
         handleSubmit,
         getValues,
+        setError,
         formState: { errors },
     } = useForm();
 
-    const onSubmit = (data) => console.log(data);
+    // const onSubmit = (data) => console.log(data);
 
-    /* const handleSubmit = async (e) => {
-        e.preventDefault();
+    const onSubmit = async (data) => {
         try {
-            await registerUser(email, password);
-            console.log("Usuario registrado -> ", email, "-", password);
+            await registerUser(data.email, data.password);
             navigate("/");
         } catch (error) {
             console.log(error.code);
+            switch (error.code) {
+                case "auth/email-already-in-use":
+                    setError("email", {
+                        message: "Esta usuario ya existe",
+                    });
+                    break;
+
+                default:
+                    console.log("Ha ocurrido un en error en el servidor");
+                    break;
+            }
         }
-    }; */
+    };
     return (
         <>
             <h1>Register</h1>
