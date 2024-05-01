@@ -1,11 +1,22 @@
-import { useContext, useState } from "react";
-import { UserContext } from "../context/UserProvider";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+
+import { UserContext } from "../context/UserProvider";
+
+import { erroresFirebase } from "../utils/ErroresFirebase";
+import { formValidate } from "../utils/formValidate";
+
+import FormError from "../components/FormError";
+import FormInput from "../components/FormInput";
 
 const Register = () => {
     const navigate = useNavigate();
     const { registerUser } = useContext(UserContext);
+
+    const { required, patternEmail, minLength, validateTrim, validateEquals } =
+        formValidate();
+
     const {
         register,
         handleSubmit,
@@ -14,76 +25,56 @@ const Register = () => {
         formState: { errors },
     } = useForm();
 
-    // const onSubmit = (data) => console.log(data);
-
     const onSubmit = async (data) => {
         try {
             await registerUser(data.email, data.password);
             navigate("/");
         } catch (error) {
-            console.log(error.code);
-            switch (error.code) {
-                case "auth/email-already-in-use":
-                    setError("email", {
-                        message: "Esta usuario ya existe",
-                    });
-                    break;
+            const errorCode = error.code;
 
-                default:
-                    console.log("Ha ocurrido un en error en el servidor");
-                    break;
-            }
+            setError("firebase", {
+                message: erroresFirebase(errorCode),
+            });
         }
     };
     return (
         <>
             <h1>Register</h1>
+            <FormError error={errors.firebase} />
+
             <form onSubmit={handleSubmit(onSubmit)}>
-                <input
+                <FormInput
                     type="email"
                     placeholder="Ingrese un email"
                     {...register("email", {
-                        required: {
-                            value: true,
-                            message: "Campo obligatorio",
-                        },
-                        pattern: {
-                            value: /[a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,15})/,
-                            message: "Formato de email incorrecto",
-                        },
+                        required,
+                        pattern: patternEmail,
                     })}
-                />
-                {errors.email && <p>{errors.email.message}</p>}
-                <input
+                ></FormInput>
+
+                <FormError error={errors.email} />
+
+                <FormInput
                     type="password"
                     placeholder="Ingrese una contraseña"
                     {...register("password", {
-                        minLength: {
-                            value: 6,
-                            message: "Minimo 6 caracteres",
-                        },
-                        validate: {
-                            trim: (v) => {
-                                if (!v.trim())
-                                    return "No se permiten caracteres vacios";
-                                true;
-                            },
-                        },
+                        minLength,
+                        validate: validateTrim,
                     })}
-                />
-                {errors.password && errors.password.message}
-                <input
+                ></FormInput>
+
+                <FormError error={errors.password} />
+
+                <FormInput
                     type="password"
                     placeholder="Ingrese la contraseña otra vez"
                     {...register("repassword", {
-                        validate: {
-                            equals: (v) =>
-                                v === getValues("password") ||
-                                "Las contraseñas no coinciden",
-                        },
+                        validate: validateEquals(getValues),
                     })}
-                />
-                {errors.repassword && <p>{errors.repassword.message}</p>}
+                ></FormInput>
+
+                <FormError error={errors.repassword} />
+
                 <button type="submit">Registrar</button>
             </form>
         </>
