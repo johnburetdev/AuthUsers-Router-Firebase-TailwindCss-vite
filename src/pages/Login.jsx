@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
@@ -10,9 +10,13 @@ import { formValidate } from "../utils/formValidate";
 
 import FormInput from "../components/FormInput";
 import FormError from "../components/FormError";
+import FormButton from "../components/FormButton";
+import Title from "../components/Title";
+import ButtonLoading from "../components/ButtonLoading";
 
 const Login = () => {
     const navigate = useNavigate();
+    const [Loading, setLoading] = useState(false);
 
     const { loginUser } = useContext(UserContext);
 
@@ -32,46 +36,57 @@ const Login = () => {
 
     const onSubmit = async (data) => {
         try {
+            setLoading(true);
             await loginUser(data.email, data.password);
             navigate("/");
         } catch (error) {
             const errorCode = error.code;
-            console.log(errorCode);
-            setError("firebase", {
-                message: erroresFirebase(errorCode),
+            const { code, message } = erroresFirebase(errorCode);
+            setError(code, {
+                message,
             });
+        } finally {
+            setLoading(false);
         }
     };
-
     return (
         <>
-            <h1>Login</h1>
+            <Title text="Iniciar sesion" />
             <div>
-                <FormError error={errors.firebase} />
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form
+                    className="max-w-sm mx-auto"
+                    onSubmit={handleSubmit(onSubmit)}
+                >
                     <FormInput
+                        label="Email"
                         type="email"
                         placeholder="Ingrese un email"
                         {...register("email", {
                             required,
                             pattern: patternEmail,
                         })}
-                    ></FormInput>
-
-                    <FormError error={errors.email} />
+                        error={errors.email}
+                    >
+                        <FormError error={errors.email} />
+                    </FormInput>
 
                     <FormInput
+                        label="Contraseña"
                         type="password"
                         placeholder="Ingrese una contraseña"
                         {...register("password", {
                             minLength,
                             validate: validateTrim,
                         })}
-                    ></FormInput>
-
-                    <FormError error={errors.password} />
-
-                    <button type="submit">Login</button>
+                        error={errors.password}
+                    >
+                        <FormError error={errors.password} />
+                    </FormInput>
+                    {Loading ? (
+                        <ButtonLoading />
+                    ) : (
+                        <FormButton type="submit" text="Ingresar" />
+                    )}
                 </form>
             </div>
         </>

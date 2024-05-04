@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 
@@ -9,9 +9,13 @@ import { formValidate } from "../utils/formValidate";
 
 import FormError from "../components/FormError";
 import FormInput from "../components/FormInput";
+import FormButton from "../components/FormButton";
+import Title from "../components/Title";
+import ButtonLoading from "../components/ButtonLoading";
 
 const Register = () => {
     const navigate = useNavigate();
+    const [Loading, setLoading] = useState(false);
     const { registerUser } = useContext(UserContext);
 
     const { required, patternEmail, minLength, validateTrim, validateEquals } =
@@ -27,55 +31,68 @@ const Register = () => {
 
     const onSubmit = async (data) => {
         try {
+            setLoading(true);
             await registerUser(data.email, data.password);
             navigate("/");
         } catch (error) {
             const errorCode = error.code;
-
-            setError("firebase", {
-                message: erroresFirebase(errorCode),
+            const { code, message } = erroresFirebase(errorCode);
+            setError(code, {
+                message,
             });
+        } finally {
+            setLoading(false);
         }
     };
     return (
         <>
-            <h1>Register</h1>
-            <FormError error={errors.firebase} />
-
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <Title text="Registrar usuarios" />
+            <form
+                className="max-w-sm mx-auto "
+                onSubmit={handleSubmit(onSubmit)}
+            >
                 <FormInput
+                    label="Email"
                     type="email"
                     placeholder="Ingrese un email"
                     {...register("email", {
                         required,
                         pattern: patternEmail,
                     })}
-                ></FormInput>
-
-                <FormError error={errors.email} />
-
+                    error={errors.email}
+                >
+                    <FormError error={errors.email} />
+                </FormInput>
                 <FormInput
+                    label="Contraseña"
                     type="password"
                     placeholder="Ingrese una contraseña"
                     {...register("password", {
                         minLength,
                         validate: validateTrim,
                     })}
-                ></FormInput>
-
-                <FormError error={errors.password} />
+                    error={errors.password}
+                >
+                    <FormError error={errors.password} />
+                </FormInput>
 
                 <FormInput
+                    label="Vuelve a ingresa la contraseña"
                     type="password"
                     placeholder="Ingrese la contraseña otra vez"
                     {...register("repassword", {
-                        validate: validateEquals(getValues),
+                        validate: validateEquals(getValues("password")),
                     })}
-                ></FormInput>
+                    error={errors.repassword}
+                >
+                    <FormError error={errors.repassword} />
+                </FormInput>
 
-                <FormError error={errors.repassword} />
-
-                <button type="submit">Registrar</button>
+                {Loading ? (
+                    <ButtonLoading />
+                ) : (
+                    <FormButton type="submit" text="Regitrarse" />
+                )}
             </form>
         </>
     );

@@ -1,5 +1,5 @@
 
-export const formValidate = (getValues) => {
+export const formValidate = () => {
   return {
     required: {
         value: true,
@@ -22,11 +22,10 @@ export const formValidate = (getValues) => {
         },
     },
 
-    validateEquals(getValues){
+    validateEquals(value){
         return {
             equals: (v) =>
-            v === getValues("password") ||
-            "Las contraseñas no coinciden",
+            v === value || "Las contraseñas no coinciden",
 
         }
         
