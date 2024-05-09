@@ -1,6 +1,7 @@
-import { collection, getDocs,query, where } from "firebase/firestore/lite"
-import { useEffect, useState } from "react"
-import { db } from "../firebase"
+import { collection, doc,  getDocs,query, setDoc, where } from "firebase/firestore/lite"
+import {  useState } from "react"
+import { auth, db } from "../firebase"
+import { nanoid } from "nanoid"
 
 export const useFirestore = ()=>{
     
@@ -8,16 +9,15 @@ export const useFirestore = ()=>{
     const [error, setError] = useState()
     const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
-        console.log("getData")
-        getData()
-    }, [])
+   
     
  const getData = async () => {
+   
+   //console.log(auth.currentUser.uid)
     try {
         setLoading(true)
         const dataRef = collection(db, "url");
-        const q = query(dataRef, where("uid", "==", "rAiHWNLL8vd1kMZd7fuLcQmRaFE3"))
+        const q = query(dataRef, where("uid", "==", auth.currentUser.uid))
         const querySnapshot = await getDocs(q);
         const dataDB = querySnapshot.docs.map((doc) => doc.data());
         setData(dataDB)
@@ -27,8 +27,33 @@ export const useFirestore = ()=>{
     }finally{
         setLoading(false)
     }
- }   
+ } 
+ 
+ const addData = async (url) => {
+    try {
+        setLoading(true)
+        const newDoc = {
+            enable: true,
+            nanoid: nanoid(4).toUpperCase(), 
+            origin: url,
+            uid: auth.currentUser.uid
+        }
+
+        const docRef = doc(db, "url", newDoc.nanoid)
+        await setDoc(docRef, newDoc)
+        setData([...data, newDoc])   
+    } catch (error) {
+        setError(error.message)
+        console.log("addData" + error.message)
+    }finally{
+        setLoading(false)
+    }
+ }
     return {
-        data, error, loading
+        data, 
+        error, 
+        loading, 
+        getData, 
+        addData
     }
 }

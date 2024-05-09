@@ -1,9 +1,23 @@
-import Loading from "../components/Loading";
-import Title from "../components/Title";
+import { useEffect, useState } from "react";
 import { useFirestore } from "../hooks/useFirestore";
 
+import Loading from "../components/Loading";
+import Title from "../components/Title";
+
 const Home = () => {
-    const { data, error, loading } = useFirestore();
+    const { data, error, loading, getData, addData } = useFirestore();
+    const [text, setText] = useState("");
+
+    useEffect(() => {
+        console.log("getData");
+        getData();
+    }, []);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await addData(text);
+        setText("");
+    };
 
     if (loading) return <Loading />;
     if (error)
@@ -31,6 +45,15 @@ const Home = () => {
     return (
         <>
             <Title text="Home" />
+            <form onSubmit={handleSubmit}>
+                <input
+                    placeholder="ex: http://johnburet.dev"
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                />
+                <button type="submit"> Add URL </button>
+            </form>
 
             <div className="mx-11">
                 <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
