@@ -13,10 +13,11 @@ import FormError from "../components/FormError";
 import FormButton from "../components/FormButton";
 import Title from "../components/Title";
 import ButtonLoading from "../components/ButtonLoading";
+import Button from "../components/Button";
 
 const Login = () => {
     const navigate = useNavigate();
-    const [Loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const { loginUser } = useContext(UserContext);
 
@@ -69,7 +70,6 @@ const Login = () => {
                     >
                         <FormError error={errors.email} />
                     </FormInput>
-
                     <FormInput
                         label="Contraseña"
                         type="password"
@@ -82,11 +82,7 @@ const Login = () => {
                     >
                         <FormError error={errors.password} />
                     </FormInput>
-                    {Loading ? (
-                        <ButtonLoading />
-                    ) : (
-                        <FormButton type="submit" text="Ingresar" />
-                    )}
+                    <Button type="submit" text="Ingresar" loading={loading} />
                 </form>
             </div>
         </>

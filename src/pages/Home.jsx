@@ -3,10 +3,14 @@ import { useFirestore } from "../hooks/useFirestore";
 
 import Loading from "../components/Loading";
 import Title from "../components/Title";
+import Button from "../components/Button";
+import { nanoid } from "nanoid";
 
 const Home = () => {
-    const { data, error, loading, getData, addData } = useFirestore();
+    const { data, error, loading, getData, addData, deleteData, updateData } =
+        useFirestore();
     const [text, setText] = useState("");
+    const [newOriginId, setNewOriginId] = useState();
 
     useEffect(() => {
         console.log("getData");
@@ -15,11 +19,26 @@ const Home = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (newOriginId) {
+            await updateData(newOriginId, text);
+            setNewOriginId("");
+            setText("");
+            return;
+        }
         await addData(text);
         setText("");
     };
 
-    if (loading) return <Loading />;
+    const handleClickDelete = async (nanoid) => {
+        await deleteData(nanoid);
+    };
+
+    const handleClickEdit = (item) => {
+        setText(item.origin);
+        setNewOriginId(item.nanoid);
+    };
+    if (loading.getData) return <Loading />;
     if (error)
         return (
             <>
@@ -52,64 +71,43 @@ const Home = () => {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                 />
-                <button type="submit"> Add URL </button>
+                {newOriginId ? (
+                    <Button
+                        text="EDIT URL"
+                        type="submit"
+                        color="green"
+                        loading={loading.updateData}
+                    />
+                ) : (
+                    <Button
+                        text="Add URL"
+                        type="submit"
+                        color="blue"
+                        loading={loading.addData}
+                    />
+                )}
             </form>
 
-            <div className="mx-11">
-                <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-                    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                            <tr>
-                                <th scope="col" className="px-6 py-3">
-                                    Nano Id
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    Original
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                    User Id
-                                </th>
-
-                                <th scope="col" className="px-6 py-3">
-                                    <span className="sr-only">Edit</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.map((item) => (
-                                <tr
-                                    key={item.nanoid}
-                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                                >
-                                    <th
-                                        scope="row"
-                                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-                                    >
-                                        {item.nanoid}
-                                    </th>
-                                    <td className="px-6 py-4">{item.origin}</td>
-                                    <td className="px-6 py-4">{item.uid}</td>
-
-                                    <td className="px-6 py-4 text-right">
-                                        <a
-                                            href="#"
-                                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                        >
-                                            Edit
-                                        </a>
-                                        <a
-                                            href="#"
-                                            className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                                        >
-                                            Delete
-                                        </a>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            {data.map((item) => (
+                <div key={item.nanoid}>
+                    <p>{item.nanoid}</p>
+                    <p>{item.origin}</p>
+                    <p>{item.uid}</p>
+                    <Button
+                        type="button"
+                        text="Eliminar"
+                        color="red"
+                        loading={loading[item.nanoid]}
+                        onClick={() => handleClickDelete(item.nanoid)}
+                    />
+                    <Button
+                        type="button"
+                        text="Editar"
+                        color="green"
+                        onClick={() => handleClickEdit(item)}
+                    />
                 </div>
-            </div>
+            ))}
         </>
     );
 };

@@ -1,4 +1,4 @@
-const FormButton = ({ text, onclick, type }) => {
+const FormButton = ({ text, onclick, type, col }) => {
     return (
         <>
             <div className="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">

@@ -1,4 +1,4 @@
-const ButtonLoading = (second) => {
+const ButtonLoading = () => {
     return (
         <>
             <button

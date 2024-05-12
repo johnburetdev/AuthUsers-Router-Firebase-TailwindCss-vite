@@ -9,13 +9,12 @@ import { formValidate } from "../utils/formValidate";
 
 import FormError from "../components/FormError";
 import FormInput from "../components/FormInput";
-import FormButton from "../components/FormButton";
 import Title from "../components/Title";
-import ButtonLoading from "../components/ButtonLoading";
+import Button from "../components/Button";
 
 const Register = () => {
     const navigate = useNavigate();
-    const [Loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const { registerUser } = useContext(UserContext);
 
     const { required, patternEmail, minLength, validateTrim, validateEquals } =
@@ -88,11 +87,7 @@ const Register = () => {
                     <FormError error={errors.repassword} />
                 </FormInput>
 
-                {Loading ? (
-                    <ButtonLoading />
-                ) : (
-                    <FormButton type="submit" text="Regitrarse" />
-                )}
+                <Button type="submit" text="Regitrarse" loading={loading} />
             </form>
         </>
     );
