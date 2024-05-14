@@ -1,6 +1,9 @@
 import { useContext } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+
 import { UserContext } from "../context/UserProvider";
+
+import Button from "./Button";
 
 const Navbar = () => {
     const { user, signOutUser } = useContext(UserContext);
@@ -33,43 +36,28 @@ const Navbar = () => {
                 </Link>
 
                 <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
-                    <ul className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
+                    <ul className="  items-center justify-between hidden w-full md:flex ">
                         {user ? (
                             <>
-                                <li>
-                                    <NavLink
-                                        to="/"
-                                        className="block py-2 px-3  rounded  md:hover:text-blue-700 md:p-0 md:dark:hover:text-blue-500 text-white hover:bg-gray-700 hover:text-white md:hover:bg-transparent border-gray-700"
-                                    >
-                                        Inicio
+                                <li className="mx-1">
+                                    <NavLink to="/">
+                                        {" "}
+                                        <Button text="Inicio" />
                                     </NavLink>
                                 </li>
                                 -
-                                <li>
-                                    <NavLink
-                                        to="perfil"
-                                        className="block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent  md:p-0 md:hover:text-blue-500 text-white dark:hover:bg-gray-700 hover:text-white  border-gray-700"
-                                    >
-                                        Perfil
+                                <li className="mx-1">
+                                    <NavLink to="perfil">
+                                        <Button text="Perfil" color="green" />
                                     </NavLink>
                                 </li>
-                                -
-                                <li>
-                                    <NavLink
-                                        to="editar"
-                                        className="block py-2 px-3  rounded hover:bg-gray-100 md:hover:bg-transparent  md:p-0 md:hover:text-blue-500 text-white dark:hover:bg-gray-700 hover:text-white  border-gray-700"
-                                    >
-                                        Editar
-                                    </NavLink>
-                                </li>
-                                <div className="flex md:order-8 space-x-4 md:space-x-0 rtl:space-x-reverse">
-                                    <button
-                                        className="text-white  focus:ring-4 focus:outline-none  font-medium rounded-lg text-sm px-4 py-2 mx-2 text-center bg-red-600 hover:bg-red-700 focus:ring-red-800"
+                                <div className="ml-2 flex md:order-8 space-x-4 md:space-x-0 rtl:space-x-reverse">
+                                    <Button
+                                        text="Cerrar sesion"
+                                        color="red"
                                         type="submit"
                                         onClick={handleClickLogOut}
-                                    >
-                                        Cerrar sesion
-                                    </button>
+                                    />
                                 </div>
                             </>
                         ) : (
