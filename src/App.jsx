@@ -8,13 +8,14 @@ import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Perfil from "./pages/Perfil";
 import Editar from "./pages/Editar";
+import NotFound from "./pages/NotFound";
 
 import Navbar from "./components/Navbar";
+import Loading from "./components/Loading";
 
 import LayoutForm from "./layouts/LayoutForm";
 import LayoutRequireAuth from "./layouts/LayoutRequireAuth";
-import NotFound from "./pages/NotFound";
-import Loading from "./components/Loading";
+import LayoutRedirect from "./layouts/LayoutRedirect";
 
 const App = () => {
     const { user } = useContext(UserContext);
@@ -44,7 +45,9 @@ const App = () => {
                     <Route path="/register" element={<Register />} />
                 </Route>
 
-                <Route path="*" element={<NotFound />} />
+                <Route path="/:nanoid" element={<LayoutRedirect />}>
+                    <Route index path="*" element={<NotFound />} />
+                </Route>
             </Routes>
         </>
     );
